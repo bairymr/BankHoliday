@@ -4,31 +4,48 @@ module Data.Time.Calendar.BankHoliday.UnitedStatesSpec (spec) where
 
 import Data.List (nub, sort)
 import Data.Time
-import Test.Hspec
-import Test.QuickCheck
-
 import Data.Time.Calendar.BankHoliday (isWeekday, yearFromDay)
 import Data.Time.Calendar.BankHoliday.UnitedStates
+import Test.Hspec
+import Test.QuickCheck
 
 spec :: Spec
 spec = do
   describe "bankHolidays" $ do
-    it "are always a weekday" $ property
-      $ \yr -> all (\d -> isWeekday d) (bankHolidays yr)
+    it "are always a weekday" $
+      property $
+        \yr -> all (\d -> isWeekday d) (bankHolidays yr)
 
     it "gets all dates in 2017 correct" $ do
       let year = fromGregorian 2017
-      let dates = [ year 1 2
-                  , year 1 16
-                  , year 2 20
-                  , year 5 29
-                  , year 7 4
-                  , year 9 4
-                  , year 10 9
-                  , year 11 23
-                  , year 12 25
-                  ]
+      let dates =
+            [ year 1 2,
+              year 1 16,
+              year 2 20,
+              year 5 29,
+              year 7 4,
+              year 9 4,
+              year 10 9,
+              year 11 23,
+              year 12 25
+            ]
       (sort (bankHolidays 2017)) `shouldBe` dates
+
+    it "gets all dates in 2021 correct" $ do
+      let year = fromGregorian 2021
+      let dates =
+            [ year 1 1,
+              year 1 18,
+              year 2 15,
+              year 5 31,
+              year 6 18,
+              year 7 5,
+              year 9 6,
+              year 10 11,
+              year 11 11,
+              year 11 25
+            ]
+      (sort (bankHolidays 2021)) `shouldBe` dates
 
     it "do not include dates before the inception of bank holidays" $ do
       (bankHolidays 1932) `shouldBe` []
@@ -65,7 +82,6 @@ spec = do
       let sameYearRange = holidaysBetweenYears 2000 2000
       nub sameYearRange `shouldBe` sameYearRange
 
-
   describe "holidaysBetween" $ do
     it "does not include dates outside of range" $ do
       let (s, e) = (fromGregorian 2014 1 2, fromGregorian 2014 7 4)
@@ -85,4 +101,3 @@ spec = do
     it "2023" $ do
       bankHolidays 2023 `shouldContain` [fromGregorian 2023 2 20] -- president day
       bankHolidays 2023 `shouldContain` [fromGregorian 2023 11 23] -- thanksgiving day
-      
